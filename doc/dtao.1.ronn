@@ -1,0 +1,179 @@
+dtao(1) -- general-purpose status, messaging, and notification bar for Wayland
+====
+
+## SYNOPSIS
+
+`dtao` [<OPTION>]...
+
+
+## DESCRIPTION
+
+`dtao` reads text and formatting commands from standard input, displaying them on a customizable status bar.
+
+
+## OPTIONS
+
+* `-b`:
+    [EXPERIMENTAL] toggle bar position between top and bottom of screen
+
+* `-bg` <COLOR>:
+    set default background color
+
+* `-e` <STRING>:
+    define actions
+
+* `-expand` {`l`|`r`}:
+    dynamically adjust left/right side of title window to fit text
+
+* `-fg` <COLOR>:
+    set default foreground color
+
+* `-fn` <FONT>:
+    set display font (using Fontconfig string)
+
+* `-h` <PIXEL>:
+    set window height
+
+* `-l` <LINES>:
+    number of lines in the sub-window
+
+* `-L` {`o`|`t`|`b`|`u`}
+    draw the bar in the overlay, top (default), bottom, or underlay/background layer
+
+* `-p` <SEC>:
+    persist for <SEC> seconds after EOF on stdin, 0 for indefinitely
+
+* `-sa` {`l`|`c`|`r`}:
+    set alignment for sub-window
+
+* `-ta` {`l`|`c`|`r`}:
+    set alignment for title window
+
+* `-tw` <PIXEL>:
+    set title window width
+
+* `-u`:
+    wrap to title-window after sub-window fills
+
+* `-w` <PIXEL>:
+    set window width
+
+* `-xs` <NUM>:
+    display on output number <NUM>
+
+* `-z`:
+    when used once: bar will not cover "exclusive zones" of other layer-shell surfaces; when used twice: bar will request its own exclusive zone
+
+
+## FORMATTING COMMANDS
+
+Formatting commands are read in-line with text. These commands have the following syntax:
+
+`^`<cmdname>`(`[<arg>[`,`<arg>]...]`)`
+
+To include a literal `^` character in the text, write `^^`.
+
+
+### Colors
+
+Color arguments are written in hex as [`#`]<RRGGBB>[<AA>].
+
+* `^fg(`[<color>]`)`:
+    set current foreground color for text, or reset to default if no argument is given
+
+* `^bg(`[<color>]`)`:
+    set current background color for text, or reset to default if no argument is given
+
+
+### Graphics [UNIMPLEMENTED]
+
+Note: the positioning of graphics in dzen is not obvious.  dtao may opt to implement different behavior instead of mirroring dzen.
+
+* `^i(`<path>`)`:
+    draw icon found at <path>
+
+* `^r(`<width>`x`<height>`)`:
+    draw filled rectangle centered at current position, moving right by <width> pixels
+
+* `^ro(`<width>`x`<height>`)`:
+    draw rectangle outline centered at current position, moving right by <width> pixels
+
+* `^c(`<diameter>`)`:
+    draw filled circle centered at current position, moving right by <diameter> pixels
+
+* `^co(`<diameter>`)`:
+    draw circle outline centered at current position, moving right by <diameter> pixels
+
+
+### Positioning
+
+* `^pa(`<x>`)`, `^pa(;`<y>`)`, `^pa(`<x>`;`<y>`)`:
+    absolute positioning: set X and/or Y position according to the argument format (see below)
+
+* `^p(`<x>`)`, `^p(;`<y>`)`, `^p(`<x>`;`<y>`)`:
+    relative positioning: calculate X and/or Y position according to the argument format and add it to the current position
+
+* `^p()`:
+    resets Y position to default; alias for `^pa(;w50)`
+
+* `^p(_LEFT)`, `^p(_CENTER)`, `^p(_RIGHT)`:
+    move to left edge, center, or right edge of window; aliases for `^pa(w0)`, `^pa(w50)`, and `^pa(w100)`
+
+* `^p(_TOP)`, `^p(_BOTTOM)`:
+    move to top or bottom edge of window; aliases for `^pa(;w0)` and `^pa(;w100)`
+
+* `^sx()`, `^rx()`:
+    save or restore X position, for aligning items vertically
+
+The `p` and `pa` commands accept the following argument formats:
+
+* <px>:
+    an integer number of pixels
+
+* `w`<pct>:
+    <pct> percent of the window width (for X) or height (for Y)
+
+* `a`<pct>, `d`<pct>:
+    <pct> percent of the text ascent or descent
+
+
+### Interaction [UNIMPLEMENTED]
+
+* `^ca(`<btn>`,`<cmd>`)`, `^ca()`:
+    defines beginning and end of a "clickable area"; when mouse button number <btn> is pressed over the text drawn between these two commands, spawn the command <cmd>
+
+
+### Actions [UNIMPLEMENTED]
+
+The actions \[`toggle`\|`un`\]`collapse`, \[`toggle`\|`un`\]`stick`, \[`toggle`\|`un`\]`hide`, `raise`, `lower`, `scroll`\{`home`\|`end`\}, and `exit` may be used as commands.
+
+
+### Other [UNIMPLEMENTED]
+
+* `^tw()`:
+    clear the title window and write the remainder of the line to it
+
+* `^cs()`:
+    clear the sub-window and write the remainder of the line to it
+
+* `^ib(`{`0`|`1`}`)`:
+    [DEPRECATED] stop (`1`) or start (`0`) drawing background fill; dtao supports alpha, so this command should be converted to `^bg(#00000000)` and `^bg(`<origclr>`)`
+
+
+## EXIT STATUS
+
+* 0:
+    Reached EOF without encountering any errors
+
+* 1:
+    Some error occurred (see output)
+
+
+## AUTHOR
+
+Written by Devin J. Pohly.
+
+
+## REPORTING BUGS
+
+See project page at [https://github.com/djpohly/dtao].

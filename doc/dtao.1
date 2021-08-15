@@ -1,0 +1,133 @@
+.\" generated with Ronn-NG/v0.9.1
+.\" http://github.com/apjanke/ronn-ng/tree/0.9.1
+.TH "DTAO" "1" "August 2021" ""
+.SH "NAME"
+\fBdtao\fR \- general\-purpose status, messaging, and notification bar for Wayland
+.SH "SYNOPSIS"
+\fBdtao\fR [\fIOPTION\fR]\|\.\|\.\|\.
+.SH "DESCRIPTION"
+\fBdtao\fR reads text and formatting commands from standard input, displaying them on a customizable status bar\.
+.SH "OPTIONS"
+.IP "\[ci]" 4
+\fB\-b\fR: [EXPERIMENTAL] toggle bar position between top and bottom of screen
+.IP "\[ci]" 4
+\fB\-bg\fR \fICOLOR\fR: set default background color
+.IP "\[ci]" 4
+\fB\-e\fR \fISTRING\fR: define actions
+.IP "\[ci]" 4
+\fB\-expand\fR {\fBl\fR|\fBr\fR}: dynamically adjust left/right side of title window to fit text
+.IP "\[ci]" 4
+\fB\-fg\fR \fICOLOR\fR: set default foreground color
+.IP "\[ci]" 4
+\fB\-fn\fR \fIFONT\fR: set display font (using Fontconfig string)
+.IP "\[ci]" 4
+\fB\-h\fR \fIPIXEL\fR: set window height
+.IP "\[ci]" 4
+\fB\-l\fR \fILINES\fR: number of lines in the sub\-window
+.IP "\[ci]" 4
+\fB\-L\fR {\fBo\fR|\fBt\fR|\fBb\fR|\fBu\fR} draw the bar in the overlay, top (default), bottom, or underlay/background layer
+.IP "\[ci]" 4
+\fB\-p\fR \fISEC\fR: persist for \fISEC\fR seconds after EOF on stdin, 0 for indefinitely
+.IP "\[ci]" 4
+\fB\-sa\fR {\fBl\fR|\fBc\fR|\fBr\fR}: set alignment for sub\-window
+.IP "\[ci]" 4
+\fB\-ta\fR {\fBl\fR|\fBc\fR|\fBr\fR}: set alignment for title window
+.IP "\[ci]" 4
+\fB\-tw\fR \fIPIXEL\fR: set title window width
+.IP "\[ci]" 4
+\fB\-u\fR: wrap to title\-window after sub\-window fills
+.IP "\[ci]" 4
+\fB\-w\fR \fIPIXEL\fR: set window width
+.IP "\[ci]" 4
+\fB\-xs\fR \fINUM\fR: display on output number \fINUM\fR
+.IP "\[ci]" 4
+\fB\-z\fR: when used once: bar will not cover "exclusive zones" of other layer\-shell surfaces; when used twice: bar will request its own exclusive zone
+.IP "" 0
+.SH "FORMATTING COMMANDS"
+Formatting commands are read in\-line with text\. These commands have the following syntax:
+.P
+\fB^\fR\fIcmdname\fR\fB(\fR[\fIarg\fR[\fB,\fR\fIarg\fR]\|\.\|\.\|\.]\fB)\fR
+.P
+To include a literal \fB^\fR character in the text, write \fB^^\fR\.
+.SS "Colors"
+Color arguments are written in hex as [\fB#\fR]\fIRRGGBB\fR[\fIAA\fR]\.
+.TP
+\fB^fg(\fR[\fIcolor\fR]\fB)\fR
+set current foreground color for text, or reset to default if no argument is given
+.TP
+\fB^bg(\fR[\fIcolor\fR]\fB)\fR
+set current background color for text, or reset to default if no argument is given
+.SS "Graphics [UNIMPLEMENTED]"
+Note: the positioning of graphics in dzen is not obvious\. dtao may opt to implement different behavior instead of mirroring dzen\.
+.TP
+\fB^i(\fR\fIpath\fR\fB)\fR
+draw icon found at \fIpath\fR
+.TP
+\fB^r(\fR\fIwidth\fR\fBx\fR\fIheight\fR\fB)\fR
+draw filled rectangle centered at current position, moving right by \fIwidth\fR pixels
+.TP
+\fB^ro(\fR\fIwidth\fR\fBx\fR\fIheight\fR\fB)\fR
+draw rectangle outline centered at current position, moving right by \fIwidth\fR pixels
+.TP
+\fB^c(\fR\fIdiameter\fR\fB)\fR
+draw filled circle centered at current position, moving right by \fIdiameter\fR pixels
+.TP
+\fB^co(\fR\fIdiameter\fR\fB)\fR
+draw circle outline centered at current position, moving right by \fIdiameter\fR pixels
+.SS "Positioning"
+.TP
+\fB^pa(\fR\fIx\fR\fB)\fR, \fB^pa(;\fR\fIy\fR\fB)\fR, \fB^pa(\fR\fIx\fR\fB;\fR\fIy\fR\fB)\fR
+absolute positioning: set X and/or Y position according to the argument format (see below)
+.TP
+\fB^p(\fR\fIx\fR\fB)\fR, \fB^p(;\fR\fIy\fR\fB)\fR, \fB^p(\fR\fIx\fR\fB;\fR\fIy\fR\fB)\fR
+relative positioning: calculate X and/or Y position according to the argument format and add it to the current position
+.TP
+\fB^p()\fR
+resets Y position to default; alias for \fB^pa(;w50)\fR
+.TP
+\fB^p(_LEFT)\fR, \fB^p(_CENTER)\fR, \fB^p(_RIGHT)\fR
+move to left edge, center, or right edge of window; aliases for \fB^pa(w0)\fR, \fB^pa(w50)\fR, and \fB^pa(w100)\fR
+.TP
+\fB^p(_TOP)\fR, \fB^p(_BOTTOM)\fR
+move to top or bottom edge of window; aliases for \fB^pa(;w0)\fR and \fB^pa(;w100)\fR
+.TP
+\fB^sx()\fR, \fB^rx()\fR
+save or restore X position, for aligning items vertically
+.P
+The \fBp\fR and \fBpa\fR commands accept the following argument formats:
+.TP
+\fIpx\fR
+an integer number of pixels
+.TP
+\fBw\fR\fIpct\fR
+\fIpct\fR percent of the window width (for X) or height (for Y)
+.TP
+\fBa\fR\fIpct\fR, \fBd\fR\fIpct\fR
+\fIpct\fR percent of the text ascent or descent
+.SS "Interaction [UNIMPLEMENTED]"
+.TP
+\fB^ca(\fR\fIbtn\fR\fB,\fR\fIcmd\fR\fB)\fR, \fB^ca()\fR
+defines beginning and end of a "clickable area"; when mouse button number \fIbtn\fR is pressed over the text drawn between these two commands, spawn the command \fIcmd\fR
+.SS "Actions [UNIMPLEMENTED]"
+The actions [\fBtoggle\fR|\fBun\fR]\fBcollapse\fR, [\fBtoggle\fR|\fBun\fR]\fBstick\fR, [\fBtoggle\fR|\fBun\fR]\fBhide\fR, \fBraise\fR, \fBlower\fR, \fBscroll\fR{\fBhome\fR|\fBend\fR}, and \fBexit\fR may be used as commands\.
+.SS "Other [UNIMPLEMENTED]"
+.TP
+\fB^tw()\fR
+clear the title window and write the remainder of the line to it
+.TP
+\fB^cs()\fR
+clear the sub\-window and write the remainder of the line to it
+.TP
+\fB^ib(\fR{\fB0\fR|\fB1\fR}\fB)\fR
+[DEPRECATED] stop (\fB1\fR) or start (\fB0\fR) drawing background fill; dtao supports alpha, so this command should be converted to \fB^bg(#00000000)\fR and \fB^bg(\fR\fIorigclr\fR\fB)\fR
+.SH "EXIT STATUS"
+.TP
+0
+Reached EOF without encountering any errors
+.TP
+1
+Some error occurred (see output)
+.SH "AUTHOR"
+Written by Devin J\. Pohly\.
+.SH "REPORTING BUGS"
+See project page at [https://github\.com/djpohly/dtao]\.
